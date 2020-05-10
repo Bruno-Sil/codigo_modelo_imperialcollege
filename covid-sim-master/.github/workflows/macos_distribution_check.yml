@@ -1,0 +1,35 @@
+name: CI for macOS
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install dependencies
+      run: ./ci/install_macos_dependencies.sh
+    - name: build
+      run: |
+        mkdir build && cd build
+        cmake ../src
+        make
+        cd ..
+    - name: regression test (UK based)
+      run: |
+        cd tests
+        pwd
+        ls -l
+        ./regressiontest_UK_100th.py
+    - name: regression test (US based)
+      run: |
+        cd "${GITHUB_WORKSPACE}/tests"
+        ./regressiontest_US_based.py
